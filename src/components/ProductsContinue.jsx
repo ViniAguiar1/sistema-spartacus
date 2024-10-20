@@ -6,12 +6,10 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import styled from "styled-components";
 
-const Products = () => {
+const ProductsContinue = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState([]);
-  const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [priceRange, setPriceRange] = useState([50, 400]); // Controle de preço
   const [cart, setCart] = useState(() => {
     // Carrega o carrinho do localStorage ou inicia com um array vazio
     const savedCart = localStorage.getItem("cart");
@@ -31,21 +29,6 @@ const Products = () => {
     toast.success("Added to cart");
   };
 
-  // Função para carregar categorias dinamicamente
-  const carregaCategorias = () => {
-    fetch("https://api.spartacusprimetobacco.com.br/api/categorias")
-      .then((response) => response.json())
-      .then((result) => {
-        const mappedCategorias = result.map((categoria) => ({
-          id: categoria.codigoCATEGORIA,
-          name: categoria.nomeCATEGORIA,
-          image: categoria.imagemCATEGORIA,
-        }));
-        setCategorias(mappedCategorias);
-      })
-      .catch((error) => console.error(error));
-  };
-
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
@@ -57,7 +40,6 @@ const Products = () => {
     };
 
     getProducts();
-    carregaCategorias();
   }, []);
 
   const Loading = () => {
@@ -75,63 +57,10 @@ const Products = () => {
     );
   };
 
-  const filterProduct = (catId) => {
-    const updatedList = data.filter((item) => item.categoriaPRODUTO === catId);
-    setFilter(updatedList);
-  };
-
-  const handlePriceChange = (event) => {
-    const newValue = [Number(event.target.value), priceRange[1]];
-    setPriceRange(newValue);
-    const updatedList = data.filter(
-      (item) => parseFloat(item.precoPRODUTO) >= priceRange[0] && parseFloat(item.precoPRODUTO) <= priceRange[1]
-    );
-    setFilter(updatedList);
-  };
-
   const ShowProducts = () => {
     return (
       <>
         <MainLayout>
-          <CategoryFilter>
-            <div style={{ marginBottom: "20px" }}>
-              <div style={{ marginBottom: "15px" }}>
-                <h5>Categoria</h5>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                  {categorias.map((categoria) => (
-                    <div
-                      key={categoria.id}
-                      style={{ textAlign: "center", cursor: "pointer" }}
-                      onClick={() => filterProduct(categoria.id)}
-                    >
-                      <img
-                        src={categoria.image}
-                        alt={categoria.name}
-                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                      />
-                      <p>{categoria.name}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ marginBottom: "15px" }}>
-                <h5>Filtro de preço</h5>
-                <input
-                  type="range"
-                  min="50"
-                  max="400"
-                  value={priceRange[0]}
-                  onChange={handlePriceChange}
-                  style={{ width: "100%", backgroundColor: "#D4AF37" }} 
-                />
-                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-                  <span>R$ {priceRange[0]}</span> - <span>R$ {priceRange[1]}</span>
-                </div>
-              </div>
-            </div>
-          </CategoryFilter>
-
           <ProductGrid>
             {filter.map((product) => {
               return (
@@ -187,7 +116,6 @@ const Products = () => {
       <div className="container my-3 py-3">
         <div className="row">
           <div className="col-12">
-            <h2 className="display-5 text-center">Top Produtos</h2>
             <hr />
           </div>
         </div>
@@ -199,7 +127,7 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default ProductsContinue;
 
 /* Styled Components */
 const MainLayout = styled.div`
