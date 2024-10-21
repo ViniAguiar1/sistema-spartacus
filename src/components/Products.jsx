@@ -158,20 +158,6 @@ const Products = () => {
                     <ul className="list-group list-group-flush">
                       <li className="list-group-item lead">R$ {parseFloat(product.precoPRODUTO).toFixed(2)}</li>
                     </ul>
-                    <div className="card-body">
-                      <Link
-                        to={"/product/" + product.codigoPRODUTO}
-                        className="btn btn-dark m-1"
-                      >
-                      Comprar agora
-                      </Link>
-                      <button
-                        className="btn btn-dark m-1"
-                        onClick={() => addProduct(product)}
-                      >
-                        Adicionar ao carrinho
-                      </button>
-                    </div>
                   </div>
                 </div>
               );
