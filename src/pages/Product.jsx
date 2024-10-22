@@ -6,13 +6,15 @@ import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import SensationDescription from "../components/SensationDescription";
+import styled from "styled-components";
 
 const Product = () => {
   const { id } = useParams(); // Pega o codigoPRODUTO da URL
-  const [product, setProduct] = useState({}); // Estado inicial de objeto vazio
-  const [similarProducts, setSimilarProducts] = useState([]); // Inicializa com um array vazio
+  const [product, setProduct] = useState({});
+  const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(""); // Para controlar a imagem principal exibida
 
   const dispatch = useDispatch();
 
@@ -32,9 +34,14 @@ const Product = () => {
         );
         const data = await response.json();
 
-        // Verifica se os dados do produto foram recebidos corretamente
         if (data && Object.keys(data).length) {
-          setProduct(data); // Define os dados do produto no estado
+          setProduct(data);
+
+          // Simulando várias imagens para o produto
+          const images = [data.imagemPRODUTO, data.imagemPRODUTO, data.imagemPRODUTO];
+          data.imagensPRODUTO = images;
+
+          setSelectedImage(images[0]); // Define a primeira imagem como padrão
 
           // Busca todos os produtos e filtra por categoria do produto principal
           const responseAll = await fetch(
@@ -42,11 +49,10 @@ const Product = () => {
           );
           const allProducts = await responseAll.json();
 
-          // Filtrar produtos da mesma categoria
           const similar = allProducts.filter(
             (item) =>
               item.categoriaPRODUTO === data.categoriaPRODUTO &&
-              item.codigoPRODUTO !== data.codigoPRODUTO // Excluir o próprio produto atual
+              item.codigoPRODUTO !== data.codigoPRODUTO
           );
           setSimilarProducts(similar);
         } else {
@@ -90,16 +96,33 @@ const Product = () => {
     <>
       <div className="container my-5 py-2">
         <div className="row">
+          <div className="col-md-2 col-sm-12 py-3">
+            {/* Mostra as miniaturas das imagens */}
+            <ThumbnailContainer>
+              {product.imagensPRODUTO?.map((img, index) => (
+                <img
+                  key={index}
+                  className={`img-fluid p-2 ${selectedImage === img ? "selected" : ""}`}
+                  src={img}
+                  alt={`Miniatura ${index + 1}`}
+                  width="80px"
+                  height="80px"
+                  onClick={() => setSelectedImage(img)} // Altera a imagem principal ao clicar
+                  style={{ cursor: "pointer", border: selectedImage === img ? "2px solid #000" : "none" }}
+                />
+              ))}
+            </ThumbnailContainer>
+          </div>
           <div className="col-md-6 col-sm-12 py-3">
             <img
               className="img-fluid"
-              src={product.imagemPRODUTO} // Verifica se a propriedade correta está sendo usada
+              src={selectedImage}
               alt={product.nomePRODUTO}
               width="400px"
               height="400px"
             />
           </div>
-          <div className="col-md-6 col-sm-12 py-5">
+          <div className="col-md-4 col-sm-12 py-5">
             <h4 className="text-uppercase text-muted">
               {product.categoriaPRODUTO}
             </h4>
@@ -114,7 +137,6 @@ const Product = () => {
               <i className="fa fa-star-half-alt" style={{ color: "gold" }}></i>
             </p>
 
-            {/* Formata o preço para ter duas casas decimais */}
             <h3 className="display-6 my-4">
               R${parseFloat(product.precoPRODUTO).toFixed(2)}
             </h3>
@@ -195,7 +217,7 @@ const Product = () => {
   return (
     <>
       <Navbar />
-      <div className="container">
+      <StyledContainer className="container">
         <div className="row">{loading ? <Loading /> : <ShowProduct />}</div>
         <div className="row my-5 py-5">
           <div className="d-none d-md-block">
@@ -214,10 +236,28 @@ const Product = () => {
             alt="Produtos Apple com frete grátis"
           />
         </div>
-      </div>
+      </StyledContainer>
       <Footer />
     </>
   );
 };
 
 export default Product;
+
+// Styled Components
+
+const ThumbnailContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  img.selected {
+    border: 2px solid black;
+  }
+`;
+
+const StyledContainer = styled.div`
+  font-family: 'Inter', sans-serif; // Define a fonte Inter para todo o container
+`;
