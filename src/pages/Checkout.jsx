@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Footer, Navbar } from "../components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const CheckoutContainer = styled.div`
@@ -181,6 +181,7 @@ const RadioLabel = styled.label`
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [shipping, setShipping] = useState(0); // Estado para o shipping
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Carregar o carrinho do localStorage
@@ -234,6 +235,8 @@ const Checkout = () => {
     localStorage.setItem("pedido", JSON.stringify(orderData));
 
     alert("Dados do pedido salvos com sucesso!");
+
+    navigate('/profile')
   };
 
   const ShowCheckout = () => {
