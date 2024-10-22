@@ -60,6 +60,9 @@ const Navbar = ({ setFilteredProducts }) => {
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/product">Produtos</NavLink>
                         </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/offers">Ofertas</NavLink>
+                        </li>
                     </ul>
                     
                     <SearchContainer>
