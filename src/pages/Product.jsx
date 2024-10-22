@@ -6,6 +6,8 @@ import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
 import SensationDescription from "../components/SensationDescription";
 import styled from "styled-components";
+import { ToastContainer, toast } from "react-toastify"; // Importa o Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Importa o CSS
 
 const Product = () => {
   const { id } = useParams(); // Pega o codigoPRODUTO da URL
@@ -19,6 +21,15 @@ const Product = () => {
 
   const addProduct = (product) => {
     dispatch(addCart(product));
+    toast.success("Produto adicionado ao carrinho!", {
+      position: "top-right",
+      autoClose: 3000, // Fecha automaticamente após 3 segundos
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   };
 
   useEffect(() => {
@@ -95,7 +106,7 @@ const Product = () => {
     <>
       <div className="container my-5 py-2">
         <div className="row">
-          <div className="col-md-2 col-sm-12 py-3">
+          <div className="col-md-1 col-sm-12 py-3">
             {/* Mostra as miniaturas das imagens */}
             <ThumbnailContainer>
               {product.imagensPRODUTO?.map((img, index) => (
@@ -121,8 +132,8 @@ const Product = () => {
               height="400px"
             />
           </div>
-          <div className="col-md-4 col-sm-12 py-5">
-            <h1 className="display-5">{product.nomePRODUTO}</h1>
+          <div className="col-md-5 4col-sm-12 py-5">
+            <h1 className="display-7">{product.nomePRODUTO}</h1>
 
             {/* Exibe as estrelas fixas e douradas */}
             <p className="lead" style={{ fontFamily: "Inter", color: "#807D7E"}}>
@@ -133,19 +144,7 @@ const Product = () => {
               <i className="fa fa-star-half-alt" style={{ color: "#BF9000" }}></i> 4.5 Avaliação do Produto
             </p>
 
-            {/* <h3 className="display-6 my-4">
-              R${parseFloat(product.precoPRODUTO).toFixed(2)}
-            </h3> */}
-            <p className="lead">{product.descricaoPRODUTO}</p>
-            {/* <button
-              className="btn btn-outline-dark"
-              onClick={() => addProduct(product)}
-            >
-              Adicionar ao carrinho
-            </button>
-            <Link to="/cart" className="btn btn-dark mx-3">
-              Ir para o carrinho
-            </Link> */}
+            {/* <p className="lead">{product.descricaoPRODUTO}</p> */}
 
             {/* Seção sobre o produto */}
             <ProductDetails>
@@ -216,6 +215,7 @@ const Product = () => {
         </div>
       </StyledContainer>
       <Footer />
+      <ToastContainer /> {/* Adiciona o container do Toastify */}
     </>
   );
 };
