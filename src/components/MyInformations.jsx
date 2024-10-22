@@ -8,10 +8,20 @@ const FormContainer = styled.div`
   gap: 20px;
 `;
 
+const FormTitle = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+`;
+
+const FormSubtitle = styled.h3`
+  font-size: 18px;
+  margin-bottom: 10px;
+`;
+
 const InputGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
 `;
 
 const Input = styled.input`
@@ -28,11 +38,13 @@ const TextArea = styled.textarea`
   width: 100%;
   resize: none;
   height: 100px;
+  grid-column: span 2; // Ocupa duas colunas
 `;
 
 const CheckboxGroup = styled.div`
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 const ButtonGroup = styled.div`
@@ -70,12 +82,13 @@ const CancelButton = styled.button`
 const MyInformation = () => {
   return (
     <FormContainer>
-      <h2>Minhas Informações</h2>
+      <FormTitle>Minhas Informações</FormTitle>
+      <FormSubtitle>Adicionar endereço</FormSubtitle>
       <InputGroup>
         <Input type="text" placeholder="Primeiro nome" />
         <Input type="text" placeholder="Sobrenome" />
         <Input type="text" placeholder="Cidade / Região" />
-        <Input type="text" placeholder="Celular" />
+        <Input type="text" placeholder="Celular*" />
         <Input type="text" placeholder="Endereço" />
         <Input type="text" placeholder="Apt, Bloco, Unidade" />
         <TextArea placeholder="Instrução de entrega" />

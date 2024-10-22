@@ -356,7 +356,7 @@ const Profile = () => {
         <UserContainer>
           <MenuLateral>
             <div className="menu-header">
-              <h2>Olá, Rennan</h2>
+              <h2>Olá, Vinicius</h2>
             </div>
             <div>
               <p style={{ fontSize: 14 }}>Bem-vindo à sua conta</p>
