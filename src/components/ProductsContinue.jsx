@@ -9,7 +9,9 @@ import styled from "styled-components";
 const ProductsContinue = () => {
   const [data, setData] = useState([]);
   const [filter, setFilter] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [priceRange, setPriceRange] = useState([50, 400]); // Controle de preço
   const [cart, setCart] = useState(() => {
     // Carrega o carrinho do localStorage ou inicia com um array vazio
     const savedCart = localStorage.getItem("cart");
@@ -29,6 +31,21 @@ const ProductsContinue = () => {
     toast.success("Added to cart");
   };
 
+  // Função para carregar categorias dinamicamente
+  const carregaCategorias = () => {
+    fetch("https://api.spartacusprimetobacco.com.br/api/categorias")
+      .then((response) => response.json())
+      .then((result) => {
+        const mappedCategorias = result.map((categoria) => ({
+          id: categoria.codigoCATEGORIA,
+          name: categoria.nomeCATEGORIA,
+          image: categoria.imagemCATEGORIA,
+        }));
+        setCategorias(mappedCategorias);
+      })
+      .catch((error) => console.error(error));
+  };
+
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
@@ -40,6 +57,7 @@ const ProductsContinue = () => {
     };
 
     getProducts();
+    carregaCategorias();
   }, []);
 
   const Loading = () => {
@@ -57,6 +75,20 @@ const ProductsContinue = () => {
     );
   };
 
+  const filterProduct = (catId) => {
+    const updatedList = data.filter((item) => item.categoriaPRODUTO === catId);
+    setFilter(updatedList);
+  };
+
+  const handlePriceChange = (event) => {
+    const newValue = [Number(event.target.value), priceRange[1]];
+    setPriceRange(newValue);
+    const updatedList = data.filter(
+      (item) => parseFloat(item.precoPRODUTO) >= priceRange[0] && parseFloat(item.precoPRODUTO) <= priceRange[1]
+    );
+    setFilter(updatedList);
+  };
+
   const ShowProducts = () => {
     return (
       <>
@@ -64,45 +96,15 @@ const ProductsContinue = () => {
           <ProductGrid>
             {filter.map((product) => {
               return (
-                <div
-                  id={product.codigoPRODUTO}
-                  key={product.codigoPRODUTO}
-                  className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4"
-                >
-                  <div className="card text-center h-100">
-                    <img
-                      className="card-img-top p-3"
-                      src={product.imagemPRODUTO}
-                      alt="Product"
-                      height={300}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title">
-                        {product.nomePRODUTO.substring(0, 12)}...
-                      </h5>
-                      <p className="card-text">
-                        {product.descricaoPRODUTO.substring(0, 90)}...
-                      </p>
-                    </div>
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item lead">R$ {parseFloat(product.precoPRODUTO).toFixed(2)}</li>
-                    </ul>
-                    <div className="card-body">
-                      <Link
-                        to={"/product/" + product.codigoPRODUTO}
-                        className="btn btn-dark m-1"
-                      >
-                      Comprar agora
-                      </Link>
-                      <button
-                        className="btn btn-dark m-1"
-                        onClick={() => addProduct(product)}
-                      >
-                        Adicionar ao carrinho
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard key={product.codigoPRODUTO}>
+                  <Link to={`/product/${product.codigoPRODUTO}`}>
+                    <ProductImage src={product.imagemPRODUTO} alt="Product" />
+                  </Link>
+                  <ProductInfo>
+                    <ProductName>{product.nomePRODUTO}</ProductName>
+                    <ProductPrice>R$ {parseFloat(product.precoPRODUTO).toFixed(2)}/unidade</ProductPrice>
+                  </ProductInfo>
+                </ProductCard>
               );
             })}
           </ProductGrid>
@@ -116,6 +118,9 @@ const ProductsContinue = () => {
       <div className="container my-3 py-3">
         <div className="row">
           <div className="col-12">
+            <HighlightTitle>
+              Destaques da Semana
+            </HighlightTitle>
             <hr />
           </div>
         </div>
@@ -132,6 +137,7 @@ export default ProductsContinue;
 /* Styled Components */
 const MainLayout = styled.div`
   display: flex;
+  font-family: 'Inter', sans-serif;
 `;
 
 const CategoryFilter = styled.div`
@@ -147,4 +153,65 @@ const ProductGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex: 1;
+  gap: 20px;
+  justify-content: center;
+`;
+
+const ProductCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px;
+  text-align: center;
+  max-width: 240px;
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background-color: #F5F5FA;
+  padding: 10px;
+`;
+
+const ProductInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const ProductName = styled.h5`
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+`;
+
+const ProductPrice = styled.span`
+  font-size: 16px;
+  color: #28a745;
+`;
+
+const HighlightTitle = styled.h1`
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  position: relative;
+  display: inline-block;
+  padding-left: 20px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 100%;
+    background-color: #D4AF37; /* Cor dourada */
+  }
 `;

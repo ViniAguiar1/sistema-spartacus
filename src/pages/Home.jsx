@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Main, Product, Footer } from '../components';
 import Banner from '../components/Banner';
 import Slider from 'react-slick';
@@ -23,6 +23,8 @@ function Home() {
     senha: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [filteredProducts, setFilteredProducts] = useState([]); // Estado para produtos filtrados
+  const [allProducts, setAllProducts] = useState([]); // Para armazenar todos os produtos
   const navigate = useNavigate();
 
   // Configurações para o carrossel do react-slick
@@ -144,6 +146,20 @@ function Home() {
     }
   };
 
+  // Carregar todos os produtos no início
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('https://api.spartacusprimetobacco.com.br/api/produtos');
+        setAllProducts(response.data);
+        setFilteredProducts(response.data); // Iniciar com todos os produtos visíveis
+      } catch (error) {
+        console.error('Erro ao buscar produtos:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   // Renderiza a tela de login se o usuário não estiver autenticado
   if (!isAuthenticated) {
     return (
@@ -217,9 +233,9 @@ function Home() {
   // Renderiza a página principal após o login
   return (
     <>
-      <Navbar />
+      <Navbar setFilteredProducts={setFilteredProducts} allProducts={allProducts} /> {/* Passa todos os produtos e a função de filtragem */}
       <Main />
-      <Product />
+      <Product products={filteredProducts} /> {/* Renderiza os produtos filtrados */}
 
       {/* Exibe os banners lado a lado no desktop */}
       <BannerContainer>
@@ -411,4 +427,4 @@ const RegisterButton = styled.button`
   &:active {
     transform: translateY(1px);
   }
-`;
+`

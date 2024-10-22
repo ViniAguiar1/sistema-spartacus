@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom'; // Import useLocation
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -8,6 +8,7 @@ const Navbar = ({ setFilteredProducts }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [allProducts, setAllProducts] = useState([]);
+    const location = useLocation(); // Hook para acessar a URL atual
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -59,12 +60,6 @@ const Navbar = ({ setFilteredProducts }) => {
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/product">Produtos</NavLink>
                         </li>
-                        {/* <li className="nav-item">
-                            <NavLink className="nav-link" to="/offers">Ofertas</NavLink>
-                        </li>
-                        <li className="nav-item">
-                            <NavLink className="nav-link" to="/login">Login</NavLink>
-                        </li>  */}
                     </ul>
                     
                     <SearchContainer>
@@ -92,11 +87,17 @@ const Navbar = ({ setFilteredProducts }) => {
                                 <i className="fa fa-user" style={{ color: "#888" }}></i>
                             </NavLink>
                         </StyledIconWrapper>
-                        <StyledIconWrapper>
+                        <StyledIconWrapper
+                            style={{
+                                backgroundColor: location.pathname.includes('/cart') ? '#D02626' : '#f5f5f5'
+                            }}
+                        >
                             <NavLink to="/cart">
                                 <CartIconContainer>
-                                    <i className="fa fa-cart-shopping" style={{ color: "#888" }}></i>
-                                    <CartBadge>({state.length})</CartBadge>
+                                    <i 
+                                        className="fa fa-cart-shopping" 
+                                        style={{ color: location.pathname.includes('/cart') ? "#FFF" : "#888" }}
+                                    ></i>
                                 </CartIconContainer>
                             </NavLink>
                         </StyledIconWrapper>
@@ -197,11 +198,4 @@ const CartIconContainer = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-`;
-
-const CartBadge = styled.span`
-  font-size: 12px;
-  margin-left: 5px;
-  color: #555;
-  vertical-align: middle;
 `;

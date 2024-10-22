@@ -79,6 +79,18 @@ const FooterContainer = styled.div`
   border-radius: 8px;
   position: relative;
   bottom: 0;
+
+  @media (max-width: 1024px) {
+    margin: 0 4rem 2rem;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 2rem 2rem;
+  }
+
+  @media (max-width: 480px) {
+    margin: 0 1rem 2rem;
+  }
 `;
 
 const FooterTitle = styled.h2`

@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+// import "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap";
 
 import {
   Home,

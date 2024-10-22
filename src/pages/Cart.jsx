@@ -4,48 +4,177 @@ import { useDispatch } from "react-redux";
 import { addCart, delCart } from "../redux/action";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { FaTrashAlt } from "react-icons/fa"; // Importa o ícone de lixeira
 
-const Section = styled.div`
-  margin-top: 20px;
+const CartContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  .form-cupom {
+  background-color: white; /* Fundo branco */
+
+  .table-responsive {
+    overflow-x: auto; /* Adiciona rolagem horizontal */
+  }
+
+  .cart-table {
+    width: 100%;
+    margin-bottom: 30px;
+    border-collapse: collapse;
+
+    th, td {
+      padding: 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #333;
+      color: white;
+    }
+
+    img {
+      width: 80px;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      button {
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      p {
+        margin: 0 10px;
+        font-size: 16px;
+      }
+    }
+
+    .remove-btn {
+      color: red;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .remove-btn:hover {
+      color: darkred;
+    }
+  }
+
+  .bottom-section {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-  }
+    margin-top: 20px;
 
-  input {
-    width: 70%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
+    .summary-section, .cupom-section {
+      width: 48%;
+      padding: 20px;
+      background-color: white; /* Fundo branco */
+    }
 
-  .btn-cupom {
-    background-color: #cda435;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
+    .summary-section h5, .cupom-section h5 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
 
-  .btn-continuar {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-top: 15px;
-    border-radius: 4px;
-    display: block;
-    text-align: center;
-  }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 15px;
+    }
 
-  h5 {
-    font-size: 18px;
-    margin-bottom: 20px;
+    .btn-finalizar {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      font-size: 18px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+
+    input {
+      width: 70%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #cda435;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .btn-continuar {
+      margin-top: 15px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px 20px;
+      border-radius: 4px;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      /* Para telas menores */
+      flex-direction: column; /* Coloca um embaixo do outro */
+      align-items: center;
+
+      .summary-section, .cupom-section {
+        width: 100%; /* Ocupar toda a largura */
+        margin-bottom: 20px;
+      }
+
+      .cart-table th, .cart-table td {
+        padding: 10px;
+      }
+
+      .qty-controls button {
+        padding: 5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      /* Para telas ainda menores */
+      img {
+        width: 60px;
+        height: auto;
+      }
+
+      input {
+        width: 100%;
+      }
+
+      .btn-finalizar {
+        font-size: 16px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+
+      .btn-continuar {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+    }
   }
 `;
 
@@ -55,22 +184,15 @@ const Cart = () => {
   const [subtotal, setSubtotal] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [coupon, setCoupon] = useState(""); // Estado do cupom
-  const [isCouponValid, setIsCouponValid] = useState(true); // Controle do botão de cupom
   const dispatch = useDispatch();
 
-  // Carrega o carrinho uma única vez ao montar o componente
   useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
     }
-    const savedShipping = localStorage.getItem("shipping");
-    if (savedShipping) {
-      setShipping(JSON.parse(savedShipping));
-    }
-  }, []); // Dependências vazias para rodar só uma vez
+  }, []);
 
-  // Atualiza o subtotal e o total de itens sempre que o carrinho é alterado
   useEffect(() => {
     let sub = 0;
     let items = 0;
@@ -84,7 +206,7 @@ const Cart = () => {
 
     setSubtotal(sub);
     setTotalItems(items);
-    localStorage.setItem("cart", JSON.stringify(cartItems)); // Salva as alterações no localStorage
+    localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
   const addItem = (product) => {
@@ -98,159 +220,138 @@ const Cart = () => {
   };
 
   const removeItem = (product) => {
+    // Remove todos os itens da linha
+    const updatedCart = cartItems.filter(
+      (item) => item.codigoPRODUTO !== product.codigoPRODUTO
+    );
+    setCartItems(updatedCart);
+    dispatch(delCart(product));
+  };
+
+  const decrementItem = (product) => {
+    // Diminui a quantidade, ou remove se a quantidade for 1
     const updatedCart = cartItems
       .map((item) => {
-        if (item.codigoPRODUTO === product.codigoPRODUTO && item.qty > 1) {
-          return { ...item, qty: item.qty - 1 };
-        } else if (item.codigoPRODUTO === product.codigoPRODUTO && item.qty === 1) {
-          return null;
+        if (item.codigoPRODUTO === product.codigoPRODUTO) {
+          if (item.qty > 1) {
+            return { ...item, qty: item.qty - 1 };
+          } else {
+            return null; // Remove se a quantidade for 1
+          }
         }
         return item;
       })
-      .filter(Boolean);
-
+      .filter(Boolean); // Remove os "nulls"
     setCartItems(updatedCart);
     dispatch(delCart(product));
+  };
+
+  const handleCouponChange = (e) => {
+    setCoupon(e.target.value);
   };
 
   const applyCoupon = () => {
     if (coupon === "VL777") {
       setShipping(0);
-      setIsCouponValid(true);
       alert("Cupom aplicado: Frete grátis!");
     } else {
       alert("Cupom inválido!");
-      setIsCouponValid(false);
     }
   };
 
-  const EmptyCart = () => {
-    return (
-      <div className="container">
-        <div className="row">
-          <div className="col-md-12 py-5 bg-light text-center">
-            <h4 className="p-3 display-5">Seu Carrinho está vazio</h4>
-            <Link to="/" className="btn  btn-outline-dark mx-4">
-              <i className="fa fa-arrow-left"></i> Continue Comprando
-            </Link>
-          </div>
+  const EmptyCart = () => (
+    <div className="container">
+      <div className="row">
+        <div className="col-md-12 py-5 bg-light text-center">
+          <h4 className="p-3 display-5">Seu Carrinho está vazio</h4>
+          <Link to="/" className="btn  btn-outline-dark mx-4">
+            <i className="fa fa-arrow-left"></i> Continue Comprando
+          </Link>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
 
-  const ShowCart = () => {
-    return (
-      <>
-        <section className="h-100 gradient-custom">
-          <div className="container py-5">
-            <div className="row d-flex justify-content-center my-4">
-              <div className="col-md-8">
-                <div className="card mb-4">
-                  <div className="card-header py-3">
-                    <h5 className="mb-0">Lista de Produtos</h5>
+  const ShowCart = () => (
+    <CartContainer>
+      <div className="table-responsive">
+        <table className="cart-table">
+          <thead>
+            <tr>
+              <th>Detalhes do Produto</th>
+              <th>Preço</th>
+              <th>Quantidade</th>
+              <th>Frete</th>
+              <th>Subtotal</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cartItems.map((item) => (
+              <tr key={item.codigoPRODUTO}>
+                <td>
+                  <img src={item.imagemPRODUTO} alt={item.nomePRODUTO} />
+                  <p>{item.nomePRODUTO}</p>
+                </td>
+                <td>R$ {parseFloat(item.precoPRODUTO).toFixed(2)}</td>
+                <td>
+                  <div className="qty-controls">
+                    <button onClick={() => decrementItem(item)}>-</button>
+                    <p>{item.qty}</p>
+                    <button onClick={() => addItem(item)}>+</button>
                   </div>
-                  <div className="card-body">
-                    {cartItems.map((item) => (
-                      <div key={item.codigoPRODUTO}>
-                        <div className="row d-flex align-items-center">
-                          <div className="col-lg-3 col-md-12">
-                            <div className="bg-image rounded">
-                              <img
-                                src={item.imagemPRODUTO}
-                                alt={item.nomePRODUTO}
-                                width={100}
-                                height={75}
-                              />
-                            </div>
-                          </div>
+                </td>
+                <td>FREE</td>
+                <td>R$ {(item.qty * item.precoPRODUTO).toFixed(2)}</td>
+                <td>
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeItem(item)}
+                    aria-label="Remover"
+                  >
+                    <FaTrashAlt size={20} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-                          <div className="col-lg-5 col-md-6">
-                            <p>
-                              <strong>{item.nomePRODUTO}</strong>
-                            </p>
-                          </div>
-
-                          <div className="col-lg-4 col-md-6">
-                            <div className="d-flex mb-4" style={{ maxWidth: "300px" }}>
-                              <button className="btn px-3" onClick={() => removeItem(item)}>
-                                <i className="fas fa-minus"></i>
-                              </button>
-
-                              <p className="mx-5">{item.qty || 0}</p>
-
-                              <button className="btn px-3" onClick={() => addItem(item)}>
-                                <i className="fas fa-plus"></i>
-                              </button>
-                            </div>
-
-                            <p className="text-start text-md-center">
-                              <strong>
-                                {item.qty || 0} x R${parseFloat(item.precoPRODUTO).toFixed(2)}
-                              </strong>
-                            </p>
-                          </div>
-                        </div>
-
-                        <hr className="my-4" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-md-4">
-                <div className="card mb-4">
-                  <div className="card-header py-3 bg-light">
-                    <h5 className="mb-0">Dados do Pedido</h5>
-                  </div>
-                  <div className="card-body">
-                    <ul className="list-group list-group-flush">
-                      <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 pb-0">
-                        Produtos ({totalItems})<span>R${subtotal.toFixed(2)}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center px-0">
-                        Taxa de Entrega
-                        <span>R${shipping.toFixed(2)}</span>
-                      </li>
-                      <li className="list-group-item d-flex justify-content-between align-items-center border-0 px-0 mb-3">
-                        <div>
-                          <strong>Total</strong>
-                        </div>
-                        <span>
-                          <strong>R${(subtotal + shipping).toFixed(2)}</strong>
-                        </span>
-                      </li>
-                    </ul>
-
-                    <Link to="/checkout" className="btn btn-dark btn-lg btn-block">
-                      Finalizar
-                    </Link>
-                  </div>
-                </div>
-
-                {/* Seção de Cupom */}
-                <Section>
-                  <h5 className="mb-3">Cupom de Desconto</h5>
-                  <div className="form-cupom">
-                    <input
-                      type="text"
-                      placeholder="Digite seu código de cupom"
-                      value={coupon}
-                      onChange={(e) => setCoupon(e.target.value)}
-                    />
-                    <button className="btn-cupom" onClick={applyCoupon}>
-                      Aplicar Cupom
-                    </button>
-                  </div>
-                </Section>
-              </div>
-            </div>
+      <div className="bottom-section">
+        <div className="summary-section">
+          <h5>Resumo</h5>
+          <div className="total-row">
+            <span>Subtotal:</span>
+            <span>R$ {subtotal.toFixed(2)}</span>
           </div>
-        </section>
-      </>
-    );
-  };
+          <div className="total-row">
+            <span>Frete:</span>
+            <span>R$ {shipping.toFixed(2)}</span>
+          </div>
+          <div className="total-row">
+            <strong>Total:</strong>
+            <strong>R$ {(subtotal + shipping).toFixed(2)}</strong>
+          </div>
+          <Link to="/checkout" className="btn-finalizar">
+            Finalizar compra
+          </Link>
+        </div>
+
+        <div className="cupom-section">
+          <h5>Cupom de Desconto</h5>
+          <input
+            type="text"
+            placeholder="Digite seu código de cupom"
+            value={coupon}
+            onChange={handleCouponChange}
+          />
+          <button onClick={applyCoupon}>Aplicar Cupom</button>
+          <Link to="/" className="btn-continuar" style={{ color: '#000' }}>Continuar Comprando</Link>
+        </div>
+      </div>
+    </CartContainer>
+  );
 
   return (
     <>

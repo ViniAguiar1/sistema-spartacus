@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams } from "react-router-dom";
-import Marquee from "react-fast-marquee";
 import { useDispatch } from "react-redux";
 import { addCart } from "../redux/action";
 import { Footer, Navbar } from "../components";
@@ -123,25 +122,22 @@ const Product = () => {
             />
           </div>
           <div className="col-md-4 col-sm-12 py-5">
-            <h4 className="text-uppercase text-muted">
-              {product.categoriaPRODUTO}
-            </h4>
             <h1 className="display-5">{product.nomePRODUTO}</h1>
 
             {/* Exibe as estrelas fixas e douradas */}
-            <p className="lead">
-              4.5 <i className="fa fa-star" style={{ color: "gold" }}></i>
-              <i className="fa fa-star" style={{ color: "gold" }}></i>
-              <i className="fa fa-star" style={{ color: "gold" }}></i>
-              <i className="fa fa-star" style={{ color: "gold" }}></i>
-              <i className="fa fa-star-half-alt" style={{ color: "gold" }}></i>
+            <p className="lead" style={{ fontFamily: "Inter", color: "#807D7E"}}>
+              <i className="fa fa-star" style={{ color: "#BF9000" }}></i>
+              <i className="fa fa-star" style={{ color: "#BF9000" }}></i>
+              <i className="fa fa-star" style={{ color: "#BF9000" }}></i>
+              <i className="fa fa-star" style={{ color: "#BF9000" }}></i>
+              <i className="fa fa-star-half-alt" style={{ color: "#BF9000" }}></i> 4.5 Avaliação do Produto
             </p>
 
-            <h3 className="display-6 my-4">
+            {/* <h3 className="display-6 my-4">
               R${parseFloat(product.precoPRODUTO).toFixed(2)}
-            </h3>
+            </h3> */}
             <p className="lead">{product.descricaoPRODUTO}</p>
-            <button
+            {/* <button
               className="btn btn-outline-dark"
               onClick={() => addProduct(product)}
             >
@@ -149,7 +145,19 @@ const Product = () => {
             </button>
             <Link to="/cart" className="btn btn-dark mx-3">
               Ir para o carrinho
-            </Link>
+            </Link> */}
+
+            {/* Seção sobre o produto */}
+            <ProductDetails>
+              <h3>Sobre este produto</h3>
+              <p>{product.descricaoPRODUTO}</p>
+              <div className="buttons">
+                <button onClick={() => addProduct(product)} className="btn btn-success">Comprar</button>
+                <span className="price">
+                  R${parseFloat(product.precoPRODUTO).toFixed(2)}
+                </span>
+              </div>
+            </ProductDetails>
           </div>
         </div>
       </div>
@@ -157,59 +165,32 @@ const Product = () => {
     </>
   );
 
-  const Loading2 = () => (
-    <>
-      <div className="my-4 py-4">
-        <div className="d-flex">
-          {[...Array(4)].map((_, index) => (
-            <div key={index} className="mx-4">
-              <Skeleton height={400} width={250} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-
   const ShowSimilarProduct = () => (
     <>
       <div className="py-4 my-4">
-        <div className="d-flex">
+        <SimilarHeader>
+          <span className="highlight"></span>
+          <h2>Produtos Similares</h2>
+        </SimilarHeader>
+        <ProductGrid>
           {similarProducts.length > 0 ? (
             similarProducts.map((item) => (
-              <div key={item.codigoPRODUTO} className="card mx-4 text-center">
+              <ProductCard key={item.codigoPRODUTO}>
                 <img
-                  className="card-img-top p-3"
                   src={item.imagemPRODUTO}
                   alt={item.nomePRODUTO}
-                  height={300}
-                  width={300}
+                  height={250}
                 />
-                <div className="card-body">
-                  <h5 className="card-title">
-                    {item.nomePRODUTO.substring(0, 15)}...
-                  </h5>
-                </div>
-                <div className="card-body">
-                  <Link
-                    to={`/product/${item.codigoPRODUTO}`}
-                    className="btn btn-dark m-1"
-                  >
-                    Comprar agora
-                  </Link>
-                  <button
-                    className="btn btn-dark m-1"
-                    onClick={() => addProduct(item)}
-                  >
-                    Adicionar ao carrinho
-                  </button>
-                </div>
-              </div>
+                <ProductInfo>
+                  <h3>{item.nomePRODUTO}</h3>
+                  <p>R$ {parseFloat(item.precoPRODUTO).toFixed(2)}</p>
+                </ProductInfo>
+              </ProductCard>
             ))
           ) : (
             <p>Nenhum produto similar encontrado.</p>
           )}
-        </div>
+        </ProductGrid>
       </div>
     </>
   );
@@ -221,10 +202,7 @@ const Product = () => {
         <div className="row">{loading ? <Loading /> : <ShowProduct />}</div>
         <div className="row my-5 py-5">
           <div className="d-none d-md-block">
-            <h2>Você também pode gostar</h2>
-            <Marquee pauseOnHover={true} pauseOnClick={true} speed={50}>
-              {loading2 ? <Loading2 /> : <ShowSimilarProduct />}
-            </Marquee>
+            {loading2 ? <Loading /> : <ShowSimilarProduct />}
           </div>
         </div>
 
@@ -248,16 +226,130 @@ export default Product;
 
 const ThumbnailContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: column; // Mantém o layout original (coluna) em telas maiores
   justify-content: center;
   align-items: center;
   gap: 10px;
-
+  
   img.selected {
     border: 2px solid black;
   }
+
+  // No mobile, mudar para linha e mover para baixo da imagem principal
+  @media (max-width: 768px) {
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 10px; // Espaçamento entre a imagem principal e as miniaturas
+  }
 `;
+
 
 const StyledContainer = styled.div`
   font-family: 'Inter', sans-serif; // Define a fonte Inter para todo o container
+`;
+
+const ProductGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+`;
+
+const ProductCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  
+  img {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border-radius: 12px;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+const ProductInfo = styled.div`
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #555;
+  }
+`;
+
+const ProductDetails = styled.div`
+  margin-top: 20px;
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 25px;
+      background-color: #28a745;
+      margin-right: 10px;
+    }
+  }
+
+  p {
+    margin-bottom: 20px;
+    color: #555;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .price {
+      background-color: #f0f0f0;
+      padding: 8px 15px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+  }
+
+  .btn-success {
+    background-color: #28a745;
+    padding: 10px 20px;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+`;
+
+const SimilarHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .highlight {
+    width: 5px;
+    height: 30px;
+    background-color: #BF9000;
+    margin-right: 10px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+  }
 `;
